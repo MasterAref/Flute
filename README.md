@@ -1,6 +1,6 @@
 # Flute
 
-**'With Flute you be able to download voice files from Linguee.com site.**'
+** _With Flute you be able to download voice files from Linguee.com site._ **
 
 ## Why?
 Currently i am learning new language and using Anki to create flash cards.
