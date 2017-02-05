@@ -12,39 +12,33 @@ namespace Flute
    {
       static void Main(string[] args)
       {
-         Download sound = new Download();
-         sound.byURL("http://www.linguee.com/mp3/DE/63/63ec45594aebdeb6075936e8e9d683b9-104");
+         Internet sound = new Internet();
+         sound.download("http://www.linguee.com/mp3/DE/63/63ec45594aebdeb6075936e8e9d683b9-104");
          
          Console.ReadLine();
       }
    }
 
-   class Download
+   /// <summary>
+   /// After getting the url this class
+   /// responsible to download it.
+   /// </summary>
+   class Internet
    {
 
-      public void byURL(string url)
+      public Stream download(string downloadLink)
       {
-         HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
+         HttpWebRequest request = (HttpWebRequest) WebRequest.Create(downloadLink);
          HttpWebResponse response = (HttpWebResponse)request.GetResponse();
-         Stream voice = response.GetResponseStream();
+         Stream stream = response.GetResponseStream();
 
-
-
-         byte[] buffer = new byte[32768];
-         using (FileStream fileStream = File.Create(@"F:\me.mp3"))
-         {
-            while (true)
-            {
-               int read = voice.Read(buffer, 0, buffer.Length);
-               if (read <= 0)
-                  break;
-               fileStream.Write(buffer, 0, read);
-            }
-         }
-
-
-         Console.ReadLine();
+         return stream;
       }
 
+
+
+
    }
+
+
 }
