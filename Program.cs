@@ -12,10 +12,10 @@ namespace Flute
    {
       static void Main(string[] args)
       {
-         Internet sound = new Internet();
-         sound.download("http://www.linguee.com/mp3/DE/63/63ec45594aebdeb6075936e8e9d683b9-104");
-         
-         Console.ReadLine();
+         StreamDownloader sound = new StreamDownloader();
+         StreamSaver ss = new StreamSaver(sound.DownloadStream("http://www.linguee.com/mp3/DE/63/63ec45594aebdeb6075936e8e9d683b9-104"));
+         ss.Save();
+         //Console.ReadLine();
       }
    }
 
@@ -23,10 +23,10 @@ namespace Flute
    /// After getting the url this class
    /// responsible to download it.
    /// </summary>
-   class Internet
+   class StreamDownloader
    {
 
-      public Stream download(string downloadLink)
+      public Stream DownloadStream(string downloadLink)
       {
          HttpWebRequest request = (HttpWebRequest) WebRequest.Create(downloadLink);
          HttpWebResponse response = (HttpWebResponse)request.GetResponse();
@@ -34,10 +34,39 @@ namespace Flute
 
          return stream;
       }
+   }
 
 
+   /// <summary>
+   /// FileSaver responsible for saving stream input as a file.
+   /// </summary>
+   class StreamSaver
+   {
+      private Stream _voiceStream;
+      public string SaveTo { get; set; }
 
 
+      public StreamSaver(Stream inputStream)
+      {
+         _voiceStream = inputStream ?? null;
+
+         SaveTo = @"E:\Test.mp3";
+      }
+
+      public void Save()
+      {
+         if (_voiceStream == null)
+         {
+            Console.WriteLine("ERROR:\tThere is no stream to save as a mp3 file.");
+            return;
+         }
+
+         using (FileStream fs = File.Create(SaveTo))
+         {
+            _voiceStream.CopyTo(fs);
+         }
+      }
+      
    }
 
 
