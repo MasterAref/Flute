@@ -12,18 +12,93 @@ namespace Flute
    {
       static void Main(string[] args)
       {
-         StreamDownloader sound = new StreamDownloader();
-         StreamSaver ss = new StreamSaver(sound.DownloadStream("http://www.linguee.com/mp3/DE/63/63ec45594aebdeb6075936e8e9d683b9-104"));
-         ss.Save();
-         //Console.ReadLine();
+         Console.WriteLine("Type default configuration file path:");
+         string defConfigPath = Console.ReadLine();
+         if (!File.Exists(defConfigPath))
+         {
+            //Call SetupConfig();
+         }
+
+         FileConfig configObject = new FileConfig(defConfigPath);
+
+         
+
+
+
+         //StreamDownload sound = new StreamDownload();
+         //StreamSave ss = new StreamSave(sound.DownloadStream("http://www.linguee.com/mp3/DE/63/63ec45594aebdeb6075936e8e9d683b9-104"));
+         //ss.SaveStream();
+
+
+
+         Console.WriteLine(configObject.HostUrl);
+         Console.ReadLine();
       }
    }
 
+
    /// <summary>
-   /// After getting the url this class
-   /// responsible to download it.
+   /// INPUT: string, url
+   /// TASK: 
+   /// OUTPUT: 
    /// </summary>
-   class StreamDownloader
+   class UrlCorrection
+   {
+      private string _sourceUrl;
+      private string _hostUrl = "http://www.linguee.com/";
+      public UrlCorrection(string address)
+      {
+         this._sourceUrl = address ?? null;
+      }
+
+      public string DetectType()
+      {
+         if (_sourceUrl == null)
+         {
+            Console.WriteLine("ERROR:\tThere is no downloading url.");
+            return _sourceUrl;
+         }
+
+         if (_sourceUrl.StartsWith("http://www.linguee.com/"))
+         {
+            
+         }
+         else if (_sourceUrl.StartsWith("DE/"))
+         {
+            _sourceUrl = _hostUrl + _sourceUrl;
+         }
+         else if (_sourceUrl.StartsWith("/DE"))
+         {
+            _sourceUrl = _sourceUrl.Substring(1);
+            _sourceUrl = _hostUrl + _sourceUrl;
+         }
+
+
+         if (!_sourceUrl.EndsWith(".mp3"))
+         {
+            if (_sourceUrl.Contains("mp3") && _sourceUrl.EndsWith("mp3"))
+            {
+               _sourceUrl = _sourceUrl.Substring(0, _sourceUrl.Length - 3);
+            }
+            _sourceUrl = _sourceUrl.Insert(_sourceUrl.Length, ".mp3");
+         }
+
+         return _sourceUrl;
+      }
+   }
+
+   interface IStreamDownload
+   {
+      
+   }
+
+
+   /// <summary>
+   /// Input: url
+   /// Task: Downloading file
+   /// Output: stream
+   /// </summary>
+   class StreamDownload
    {
 
       public Stream DownloadStream(string downloadLink)
@@ -40,22 +115,31 @@ namespace Flute
    /// <summary>
    /// FileSaver responsible for saving stream input as a file.
    /// </summary>
-   class StreamSaver
+   class StreamSave
    {
-      private Stream _voiceStream;
+      private Stream _stream;
+      public StreamSave(Stream inputStream)
+      {
+         this._stream = inputStream ?? null;
+      }
+
+      private IStreamDownload _streamDownload;
       public string SaveTo { get; set; }
 
 
-      public StreamSaver(Stream inputStream)
-      {
-         _voiceStream = inputStream ?? null;
+      
 
-         SaveTo = @"E:\Test.mp3";
+      public StreamSave(IStreamDownload inputStream)
+      {
+         this._streamDownload = inputStream;
       }
 
-      public void Save()
+
+      public void SaveStream()
       {
-         if (_voiceStream == null)
+         SaveTo = @"E:\Test.mp3";
+
+         if (_stream == null)
          {
             Console.WriteLine("ERROR:\tThere is no stream to save as a mp3 file.");
             return;
@@ -63,11 +147,60 @@ namespace Flute
 
          using (FileStream fs = File.Create(SaveTo))
          {
-            _voiceStream.CopyTo(fs);
+            _stream.CopyTo(fs);
          }
       }
-      
+
    }
 
 
+   interface IFileConfig
+   {
+      
+   }
+
+   /// <summary>
+   /// A type that represent how(name, tag, etc) and where(path) the file will save.
+   /// </summary>
+   class FileConfig : IFileConfig
+   {
+      public string HostUrl { get; set; }
+      public string SaveTo { get; set; }
+      public string Prefix { get; set; }
+
+      public FileConfig(string configPath)
+      {
+         if (!File.Exists(configPath))
+         {
+            return;
+         }
+         string[] allLines = File.ReadAllLines(configPath);
+         string[] valueKey;
+
+         foreach (var line in allLines)
+         {
+            valueKey = line.Split(' ');
+
+            switch (valueKey[0])
+            {
+               case "Host:":
+                  HostUrl = valueKey[1];
+                  break;
+
+               case "SaveTo:":
+                  SaveTo = valueKey[1];
+                  break;
+
+               case "Prefix:":
+                  Prefix = valueKey[1];
+                  break;
+
+               default:
+                  return;
+            }
+         }
+         
+      }
+
+   }
 }
