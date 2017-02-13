@@ -13,11 +13,11 @@ namespace Flute
 
       static void Main(string[] args)
       {
-         Dictionary<String, string> commands = new Dictionary<string, string>();
-         commands["R"] = "to Recheck";
-         commands["N"] = "to Insert New path.";
-         commands["C"] = "to Create new Config file.";
-         commands["Q"] = "to Exit.";
+         Dictionary<String, string> cmdsCfgNotFound = new Dictionary<string, string>();
+         cmdsCfgNotFound["R"] = "to Recheck";
+         cmdsCfgNotFound["N"] = "to Insert New path.";
+         cmdsCfgNotFound["C"] = "to Create new Config file.";
+         cmdsCfgNotFound["Q"] = "to Exit.";
 
          
          Console.WriteLine("Type default configuration file path:");
@@ -29,10 +29,10 @@ namespace Flute
             Console.WriteLine($"No Config file found in {defConfigPath}.");
 
             // NON-Recursive
-            ShowInstruction(commands);
+            ShowInstruction(cmdsCfgNotFound);
             do
             {
-               nextcmd = GetCommand(commands);
+               nextcmd = GetCommand(cmdsCfgNotFound);
             } while (nextcmd == null);
 
 
