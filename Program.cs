@@ -3,98 +3,134 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Reflection;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace Flute
 {
-   class Program
+   interface IDefCommands
    {
+      bool IsCfgExist(string path);
+      void Exit();
+   }
 
-      static void Main(string[] args)
+   class DefCommands : IDefCommands
+   {
+      public bool IsCfgExist(string path)
       {
-         Console.Title = "Flute";
-
-         Run();
-      }
-
-      static void Run()
-      {
-         
-      }
-      static bool CheckPath(string path)
-      {
+         Console.WriteLine(new string('-', typeof(DefCommands).GetMethod("IsCfgExist").Name.Length + 16));
+         Console.WriteLine($"|----- {typeof(DefCommands).GetMethod("IsCfgExist").Name}() -----|");
+         Console.WriteLine(new string('-', typeof(DefCommands).GetMethod("IsCfgExist").Name.Length + 16));
          if (!File.Exists(path))
          {
-            Console.WriteLine($"No Config file found in {path}.");
+            Console.WriteLine($"No Config file found in {path}");
             return false;
          }
          return true;
       }
-      static void ShowInstruction(Dictionary<string, string> cmds)
-      {
-         foreach (var command in cmds)
-         {
-            Console.WriteLine($"Press {command.Key.PadRight(5)}{command.Value}");
-         }
-      }
 
-      static string GetCommand_String(Dictionary<string, string> validCommands)
+      public void Exit()
       {
-         //[NOTE] userInput is Key not value such as "R","A","D", ...
-         string userInput = Console.ReadLine().ToUpper();
-         if (validCommands.ContainsKey(userInput))
-         {
-            return userInput;
-         }
-         else
-         {
-            string errorMsg = "ERROR: Please enter proper Command!\n";
-            Console.WriteLine(errorMsg + new String('-', errorMsg.Length));
-            return null;
-         }
-      }
-
-      static string AutomateCmd_String(Dictionary<String, String> commandDictionary )
-      {
-         string userCmd;
-         // NON-Recursive
-         ShowInstruction(commandDictionary);
-         do
-         {
-            userCmd = GetCommand_String(commandDictionary);
-         } while (userCmd == null);
-         return userCmd;
-      }
-
-      static string ShowInstructionGetCmd(Dictionary<string, string> cmds)
-      {
-         foreach (var command in cmds)
-         {
-            Console.WriteLine($"Press {command.Key.PadRight(5)}{command.Value}");
-         }
-
-         return GetCommandRecursive(cmds);
-      }
-
-      static string GetCommandRecursive(Dictionary<string, string> validCommands)
-      {
-         //[TODO] Make it recursive
-         //[PROBLEM] Now if we have sequence like "w1" "w2" "c" which "c" is correct and others are wrong 
-         // it will return "w1" at end. But we want "c"
-         //[NOTE] userInput is Key not value such as "R","A","D", ...
-         string userInput = Console.ReadLine().ToUpper();
-         if (!validCommands.ContainsKey(userInput))
-         {
-            string errorMsg = "ERROR: Please enter proper Command!\n";
-            Console.WriteLine(errorMsg + new String('-', errorMsg.Length));
-            GetCommandRecursive(validCommands);
-            
-         }
-         return userInput;
+         Environment.Exit(0);
       }
    }
 
+   class Program
+   {
+      const string _promptIndicator = ">";
+
+      static void Main(string[] args)
+      {
+         Console.Title = "Flute v 0.1";
+
+         Run();
+
+         Console.WriteLine("END OF LINE");
+         Console.Read();
+      }
+
+      static void Run()
+      {
+         Dictionary<string, string> cmdsCfgNotFound = new Dictionary<string, string>();
+         cmdsCfgNotFound["R"] = "To Recheck";
+         cmdsCfgNotFound["N"] = "Check cfg in new path.";
+         cmdsCfgNotFound["C"] = "To Create new Config file.";
+         cmdsCfgNotFound["Q"] = "To Exit.";
+
+
+         Dictionary<string, string> commandlist = new Dictionary<string, string>();
+         commandlist["R"] = "IsCfgExist";
+         commandlist["N"] = "IsCfgExist";
+         commandlist["Q"] = "Exit";
+
+         Console.WriteLine("To see available commands press 'L'");
+         while (true)
+         {
+            var consoleInput = ReadUserCmd();
+            if (String.IsNullOrWhiteSpace(consoleInput)) continue;
+
+            if(!commandlist.ContainsKey(consoleInput)) continue;
+
+            var assembly = Assembly.GetExecutingAssembly();
+            var methodToCall = typeof(IDefCommands).GetMethod(commandlist[consoleInput]);
+            switch (consoleInput)
+            {
+               case "R":
+                  methodToCall.Invoke(new DefCommands(), new object[] { "E:\\" });
+                  break;
+
+               case "N":
+                  string path = WriteToConsole("Type cfg path (e.g: C:\\htdocs\\myconfig.cfg");
+                  methodToCall.Invoke(new DefCommands(), new object[] { path });
+                  break;
+
+               case "Q":
+                  methodToCall.Invoke(new DefCommands(), null);
+                  break;
+            }
+            
+            
+
+            try
+            {
+               
+
+            }
+            catch (TargetInvocationException ex)
+            {
+               throw ex.InnerException;
+            }
+
+            //Console.WriteLine(Console.ReadLine());
+
+         }
+      }
+
+
+      static void ShowInstruction(Dictionary<string, string> instructions)
+      {
+         foreach (var instruction in instructions)
+         {
+            Console.WriteLine($"{instruction.Value} Press {instruction.Key}");
+         }
+      }
+
+      static string WriteToConsole(string promptMessage = "")
+      {
+         Console.WriteLine(_promptIndicator + promptMessage);
+         return Console.ReadLine();
+      }
+
+      static string ReadUserCmd()
+      {
+         Console.Write(">");
+         return Console.ReadLine().ToUpper();
+      }
+   }
+
+   
 
    /// <summary>
    /// INPUT: string, url
