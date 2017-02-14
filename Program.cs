@@ -13,75 +13,24 @@ namespace Flute
 
       static void Main(string[] args)
       {
-         Dictionary<String, string> cmdsCfgNotFound = new Dictionary<string, string>();
-         cmdsCfgNotFound["R"] = "to Recheck";
-         cmdsCfgNotFound["N"] = "to Insert New path.";
-         cmdsCfgNotFound["C"] = "to Create new Config file.";
-         cmdsCfgNotFound["Q"] = "to Exit.";
+         Console.Title = "Flute";
 
-         
-         Console.WriteLine("Type default configuration file path:");
-         string defConfigPath = Console.ReadLine();
-
-         if (!File.Exists(defConfigPath))
-         {
-            string nextcmd;
-            Console.WriteLine($"No Config file found in {defConfigPath}.");
-
-            // NON-Recursive
-            ShowInstruction(cmdsCfgNotFound);
-            do
-            {
-               nextcmd = GetCommand(cmdsCfgNotFound);
-            } while (nextcmd == null);
-
-
-            // Validate & Call proper Method
-            switch (nextcmd.ToUpper())
-            {
-               case "r":
-               case "R":
-                  // Call method
-                  break;
-
-               case "n":
-               case "N":
-                  // Call method
-                  break;
-
-               case "c":
-               case "C":
-                  // Call method
-                  break;
-
-               case "q":
-               case "Q":
-                  Environment.Exit(0);
-                  break;
-
-               case null:
-               default:
-                  Console.WriteLine("Please enter proper command!");
-                  break;
-            }
-         }
-
-         FileConfig configObject = new FileConfig(defConfigPath);
-
-         
-
-
-
-         //StreamDownload sound = new StreamDownload();
-         //StreamSave ss = new StreamSave(sound.DownloadStream("http://www.linguee.com/mp3/DE/63/63ec45594aebdeb6075936e8e9d683b9-104"));
-         //ss.SaveStream();
-
-
-
-         Console.WriteLine(configObject.HostUrl);
-         Console.ReadLine();
+         Run();
       }
 
+      static void Run()
+      {
+         
+      }
+      static bool CheckPath(string path)
+      {
+         if (!File.Exists(path))
+         {
+            Console.WriteLine($"No Config file found in {path}.");
+            return false;
+         }
+         return true;
+      }
       static void ShowInstruction(Dictionary<string, string> cmds)
       {
          foreach (var command in cmds)
@@ -90,7 +39,7 @@ namespace Flute
          }
       }
 
-      static string GetCommand(Dictionary<string, string> validCommands)
+      static string GetCommand_String(Dictionary<string, string> validCommands)
       {
          //[NOTE] userInput is Key not value such as "R","A","D", ...
          string userInput = Console.ReadLine().ToUpper();
@@ -104,6 +53,18 @@ namespace Flute
             Console.WriteLine(errorMsg + new String('-', errorMsg.Length));
             return null;
          }
+      }
+
+      static string AutomateCmd_String(Dictionary<String, String> commandDictionary )
+      {
+         string userCmd;
+         // NON-Recursive
+         ShowInstruction(commandDictionary);
+         do
+         {
+            userCmd = GetCommand_String(commandDictionary);
+         } while (userCmd == null);
+         return userCmd;
       }
 
       static string ShowInstructionGetCmd(Dictionary<string, string> cmds)
