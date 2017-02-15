@@ -29,10 +29,11 @@ namespace Flute
          return true;
       }
 
-      public void ReadCfg(string path, char deliminator = ':')
+      public Dictionary<string, string> ReadCfg(string path, char deliminator = ':')
       {
          // Check file exist. Then proceed if YES.
-         if(!IsCfgExist(path)) return;
+         //if(!IsCfgExist(path)) throw new ArgumentException("File Not Exist!");
+         if (!IsCfgExist(path)) return null;
 
          // Reading File
          string[] cfgLinesString = File.ReadAllLines(path);
@@ -48,7 +49,10 @@ namespace Flute
 
             configDictionary.Add(tempKey, tempValue);
          }
+
+         return configDictionary;
       }
+
 
 
       public void Exit()
