@@ -13,6 +13,7 @@ namespace Flute
    interface IDefCommands
    {
       bool IsCfgExist(string path);
+
       void Exit();
    }
 
@@ -20,9 +21,6 @@ namespace Flute
    {
       public bool IsCfgExist(string path)
       {
-         Console.WriteLine(new string('-', typeof(DefCommands).GetMethod("IsCfgExist").Name.Length + 16));
-         Console.WriteLine($"|----- {typeof(DefCommands).GetMethod("IsCfgExist").Name}() -----|");
-         Console.WriteLine(new string('-', typeof(DefCommands).GetMethod("IsCfgExist").Name.Length + 16));
          if (!File.Exists(path))
          {
             Console.WriteLine($"No Config file found in {path}");
@@ -30,6 +28,28 @@ namespace Flute
          }
          return true;
       }
+
+      public void ReadCfg(string path, char deliminator = ':')
+      {
+         // Check file exist. Then proceed if YES.
+         if(!IsCfgExist(path)) return;
+
+         // Reading File
+         string[] cfgLinesString = File.ReadAllLines(path);
+
+
+         // Create Dictionary
+         Dictionary<string, string> configDictionary = new Dictionary<string, string>();
+         foreach (var cfgLine in cfgLinesString)
+         {
+            int seperatorLoc = cfgLine.IndexOf(deliminator);
+            string tempKey = cfgLine.Substring(0, seperatorLoc);
+            string tempValue = cfgLine.Substring(seperatorLoc);
+
+            configDictionary.Add(tempKey, tempValue);
+         }
+      }
+
 
       public void Exit()
       {
@@ -45,7 +65,12 @@ namespace Flute
       {
          Console.Title = "Flute v 0.1";
 
-         Run();
+         //[NOTE] Testing Purpose
+         DefCommands o = new DefCommands();
+         o.ReadCfg(@"E:\config.txt");
+
+         //[TODO] Uncomment
+         //Run();
 
          Console.WriteLine("END OF LINE");
          Console.Read();
