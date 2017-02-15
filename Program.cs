@@ -44,8 +44,8 @@ namespace Flute
          foreach (var cfgLine in cfgLinesString)
          {
             int seperatorLoc = cfgLine.IndexOf(deliminator);
-            string tempKey = cfgLine.Substring(0, seperatorLoc);
-            string tempValue = cfgLine.Substring(seperatorLoc);
+            string tempKey = cfgLine.Substring(0, seperatorLoc).Replace(" ", string.Empty);
+            string tempValue = cfgLine.Substring(seperatorLoc).Replace(" ", string.Empty);
 
             configDictionary.Add(tempKey, tempValue);
          }
@@ -53,7 +53,7 @@ namespace Flute
          return configDictionary;
       }
 
-
+      
 
       public void Exit()
       {
