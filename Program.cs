@@ -10,6 +10,13 @@ using System.Threading.Tasks;
 
 namespace Flute
 {
+   struct ConfigObject
+   {
+      public string[] sources;
+      public string[] prefixes;
+      public string saveTo;
+   }
+
    interface IDefCommands
    {
       bool IsCfgExist(string path);
@@ -31,7 +38,7 @@ namespace Flute
 
       public Dictionary<string, string> ReadCfg(string path, char deliminator = ':')
       {
-         // Check file exist. Then proceed if YES.
+         // Proceed if file exist.
          //if(!IsCfgExist(path)) throw new ArgumentException("File Not Exist!");
          if (!IsCfgExist(path)) return null;
 
@@ -43,9 +50,10 @@ namespace Flute
          Dictionary<string, string> configDictionary = new Dictionary<string, string>();
          foreach (var cfgLine in cfgLinesString)
          {
-            int seperatorLoc = cfgLine.IndexOf(deliminator);
-            string tempKey = cfgLine.Substring(0, seperatorLoc).Replace(" ", string.Empty);
-            string tempValue = cfgLine.Substring(seperatorLoc).Replace(" ", string.Empty);
+            string currentLine = cfgLine.Replace(" ", string.Empty);
+            int seperatorLoc = currentLine.IndexOf(deliminator);
+            string tempKey = currentLine.Substring(0, seperatorLoc);
+            string tempValue = currentLine.Substring(seperatorLoc+1);
 
             configDictionary.Add(tempKey, tempValue);
          }
@@ -53,7 +61,17 @@ namespace Flute
          return configDictionary;
       }
 
-      
+      public ConfigObject ValidateConfig(Dictionary<string, string> configParams, char delimator = ',')
+      {
+         //[TODO]: validation rules!
+
+
+         ConfigObject configO;
+         configO.sources = configParams["sources"].Split(',');
+         configO.prefixes = configParams["prefixes"].Split(',');
+         configO.saveTo = configParams["saveTo"];
+         return configO;
+      }
 
       public void Exit()
       {
@@ -70,8 +88,15 @@ namespace Flute
          Console.Title = "Flute v 0.1";
 
          //[NOTE] Testing Purpose
+
+         //[SCENE-1]: getting fine configuration
          DefCommands o = new DefCommands();
-         o.ReadCfg(@"E:\config.txt");
+         ConfigObject ConfigObject = o.ValidateConfig(o.ReadCfg(@"E:\IdealConfig.txt"));
+
+
+         //[SCENE-2]: Download link exist in clipboard
+
+
 
          //[TODO] Uncomment
          //Run();
