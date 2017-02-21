@@ -172,7 +172,7 @@ namespace Flute
 
       public ConfigObject ValidateConfig(Dictionary<string, string> configParams, char delimator = ',')
       {
-         //[TODO]: validation rules!
+         //TODO: validation rules!
 
 
          ConfigObject configO;
@@ -231,48 +231,74 @@ namespace Flute
    /// TASK: 
    /// OUTPUT: 
    /// </summary>
-   class UrlCorrection
+   class UrlValidate
    {
-      private string _sourceUrl;
-      private string _hostUrl = "http://www.linguee.com/";
-      public UrlCorrection(string address)
+      private string _fileUrl;
+      private string[] _hostsUrl;
+      public UrlValidate(string address, string[] hostsString)
       {
-         this._sourceUrl = address ?? null;
+         this._fileUrl = address ?? null;
+         this._hostsUrl = hostsString ?? null;
+
+         if (!IsFullUrl(_fileUrl)) return;
+         if (string.IsNullOrWhiteSpace(_fileUrl) || _hostsUrl == null) return;
       }
 
+      //NOTE: If provided string was not Full path url then it assuemes its reletive. 
+      // in above situation or returning true by IsFullUrl() we then identifying host
+      // with DetectHost().
+      private bool IsFullUrl(string check)
+      {
+         if (check.StartsWith("http://www.")) return true;
+         if (check.StartsWith("https://www.")) return true;
+         if (check.StartsWith("http://")) return true;
+         if (check.StartsWith("https://")) return true;
+
+         return false;
+      }
+
+      
+
+      public string DetectHost()
+      {
+         //TODO: write code.
+
+
+         return "";
+      }
       public string DetectType()
       {
-         if (_sourceUrl == null)
+         if (_fileUrl == null)
          {
             Console.WriteLine("ERROR:\tThere is no downloading url.");
-            return _sourceUrl;
+            return _fileUrl;
          }
 
-         if (_sourceUrl.StartsWith("http://www.linguee.com/"))
+         if (_fileUrl.StartsWith("http://www.linguee.com/"))
          {
             
          }
-         else if (_sourceUrl.StartsWith("DE/"))
+         else if (_fileUrl.StartsWith("DE/"))
          {
-            _sourceUrl = _hostUrl + _sourceUrl;
+            _fileUrl = _hostsUrl + _fileUrl;
          }
-         else if (_sourceUrl.StartsWith("/DE"))
+         else if (_fileUrl.StartsWith("/DE"))
          {
-            _sourceUrl = _sourceUrl.Substring(1);
-            _sourceUrl = _hostUrl + _sourceUrl;
+            _fileUrl = _fileUrl.Substring(1);
+            _fileUrl = _hostsUrl + _fileUrl;
          }
 
 
-         if (!_sourceUrl.EndsWith(".mp3"))
+         if (!_fileUrl.EndsWith(".mp3"))
          {
-            if (_sourceUrl.Contains("mp3") && _sourceUrl.EndsWith("mp3"))
+            if (_fileUrl.Contains("mp3") && _fileUrl.EndsWith("mp3"))
             {
-               _sourceUrl = _sourceUrl.Substring(0, _sourceUrl.Length - 3);
+               _fileUrl = _fileUrl.Substring(0, _fileUrl.Length - 3);
             }
-            _sourceUrl = _sourceUrl.Insert(_sourceUrl.Length, ".mp3");
+            _fileUrl = _fileUrl.Insert(_fileUrl.Length, ".mp3");
          }
 
-         return _sourceUrl;
+         return _fileUrl;
       }
    }
 
