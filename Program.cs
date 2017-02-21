@@ -7,80 +7,16 @@ using System.Reflection;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
+using System.Runtime.InteropServices;
 
 namespace Flute
 {
-   struct ConfigObject
-   {
-      public string[] sources;
-      public string[] prefixes;
-      public string saveTo;
-   }
-
-   interface IDefCommands
-   {
-      bool IsCfgExist(string path);
-
-      void Exit();
-   }
-
-   class DefCommands : IDefCommands
-   {
-      public bool IsCfgExist(string path)
-      {
-         if (!File.Exists(path))
-         {
-            Console.WriteLine($"No Config file found in {path}");
-            return false;
-         }
-         return true;
-      }
-
-      public Dictionary<string, string> ReadCfg(string path, char deliminator = ':')
-      {
-         // Proceed if file exist.
-         //if(!IsCfgExist(path)) throw new ArgumentException("File Not Exist!");
-         if (!IsCfgExist(path)) return null;
-
-         // Reading File
-         string[] cfgLinesString = File.ReadAllLines(path);
-
-
-         // Create Dictionary
-         Dictionary<string, string> configDictionary = new Dictionary<string, string>();
-         foreach (var cfgLine in cfgLinesString)
-         {
-            string currentLine = cfgLine.Replace(" ", string.Empty);
-            int seperatorLoc = currentLine.IndexOf(deliminator);
-            string tempKey = currentLine.Substring(0, seperatorLoc);
-            string tempValue = currentLine.Substring(seperatorLoc+1);
-
-            configDictionary.Add(tempKey, tempValue);
-         }
-
-         return configDictionary;
-      }
-
-      public ConfigObject ValidateConfig(Dictionary<string, string> configParams, char delimator = ',')
-      {
-         //[TODO]: validation rules!
-
-
-         ConfigObject configO;
-         configO.sources = configParams["sources"].Split(',');
-         configO.prefixes = configParams["prefixes"].Split(',');
-         configO.saveTo = configParams["saveTo"];
-         return configO;
-      }
-
-      public void Exit()
-      {
-         Environment.Exit(0);
-      }
-   }
-
    class Program
    {
+      
+
+
       const string _promptIndicator = ">";
 
       static void Main(string[] args)
@@ -95,7 +31,7 @@ namespace Flute
 
 
          //[SCENE-2]: Download link exist in clipboard
-
+         string copyLink = new UrlClipboard().CopyLink();
 
 
          //[TODO] Uncomment
@@ -162,7 +98,6 @@ namespace Flute
          }
       }
 
-
       static void ShowInstruction(Dictionary<string, string> instructions)
       {
          foreach (var instruction in instructions)
@@ -184,7 +119,112 @@ namespace Flute
       }
    }
 
-   
+   struct ConfigObject
+   {
+      public string[] sources;
+      public string[] prefixes;
+      public string saveTo;
+   }
+
+   interface IDefCommands
+   {
+      bool IsCfgExist(string path);
+
+      void Exit();
+   }
+
+   class DefCommands : IDefCommands
+   {
+      public bool IsCfgExist(string path)
+      {
+         if (!File.Exists(path))
+         {
+            Console.WriteLine($"No Config file found in {path}");
+            return false;
+         }
+         return true;
+      }
+
+      public Dictionary<string, string> ReadCfg(string path, char deliminator = ':')
+      {
+         // Proceed if file exist.
+         //if(!IsCfgExist(path)) throw new ArgumentException("File Not Exist!");
+         if (!IsCfgExist(path)) return null;
+
+         // Reading File
+         string[] cfgLinesString = File.ReadAllLines(path);
+
+
+         // Create Dictionary
+         Dictionary<string, string> configDictionary = new Dictionary<string, string>();
+         foreach (var cfgLine in cfgLinesString)
+         {
+            string currentLine = cfgLine.Replace(" ", string.Empty);
+            int seperatorLoc = currentLine.IndexOf(deliminator);
+            string tempKey = currentLine.Substring(0, seperatorLoc);
+            string tempValue = currentLine.Substring(seperatorLoc + 1);
+
+            configDictionary.Add(tempKey, tempValue);
+         }
+
+         return configDictionary;
+      }
+
+      public ConfigObject ValidateConfig(Dictionary<string, string> configParams, char delimator = ',')
+      {
+         //[TODO]: validation rules!
+
+
+         ConfigObject configO;
+         configO.sources = configParams["sources"].Split(',');
+         configO.prefixes = configParams["prefixes"].Split(',');
+         configO.saveTo = configParams["saveTo"];
+         return configO;
+      }
+
+      public void Exit()
+      {
+         Environment.Exit(0);
+      }
+   }
+
+
+   class UrlClipboard
+   {
+      [DllImport("user32.dll")]
+      internal static extern bool OpenClipboard(IntPtr hWndNewOwner);
+
+      [DllImport("user32.dll")]
+      internal static extern bool SetClipboardData(uint uFormat, IntPtr data);
+
+      [DllImport("user32.dll")]
+      private static extern IntPtr GetClipboardData(uint uFormat);
+
+      [DllImport("user32.dll")]
+      internal static extern bool CloseClipboard();
+
+      [DllImport("user32.dll")]
+      internal static extern bool EmptyClipboard();
+
+      public string CopyLink()
+      {
+         OpenClipboard(IntPtr.Zero);
+         var data = Marshal.PtrToStringAuto(GetClipboardData(13));
+         EmptyClipboard();
+         CloseClipboard();
+         return data;
+      }
+
+      // Example from http://stackoverflow.com/questions/13571426/how-can-i-copy-a-string-to-clipboard-within-my-console-app-without-adding-a-refe
+      //OpenClipboard(IntPtr.Zero);
+      ////var yourString = "Hello World!";
+      ////var ptr = Marshal.StringToHGlobalUni(yourString);
+      ////SetClipboardData(13, ptr);
+      //var t = Marshal.PtrToStringAuto(GetClipboardData(13));
+      //CloseClipboard();
+      ////Marshal.FreeHGlobal(ptr);
+   }
+
 
    /// <summary>
    /// INPUT: string, url
