@@ -253,7 +253,8 @@ namespace Flute
       // FIELDS & PROPERTIES
       private string _fileUrl;
       private string[] _hostsUrl;
-      private string currentHost { get; set; }
+      private string urlValidateHost;
+      private string urlValidateDlLink;
 
 
       // CONSTRUCT
@@ -271,16 +272,20 @@ namespace Flute
       {
          DownloadObject dlObject = new DownloadObject();
 
-         // Setup 'host'
+         // Setup 'DownloadObject.host'
          if (IsFullUrl(_fileUrl)) DetectFullUrlHost();
          if (IsFullUrl(_fileUrl)) DetectRelativeUrlHost();
-         dlObject.host = currentHost;
+         dlObject.host = urlValidateHost;
+
+         // Setup 'DownloadObject.downloadUrl'
+         if (!IsFullUrl(_fileUrl)) urlValidateDlLink = urlValidateHost + _fileUrl;
+         dlObject.downloadUrl = urlValidateDlLink;
 
 
          //TODO: Setup other 'DownloadObject' fields
 
          //TODO: Error checking for each 'DownloadObject' fields
-         if (currentHost == null)
+         if (urlValidateHost == null)
          {
             Console.WriteLine("ERRPR: cannot find out file's host.");
          }
@@ -315,7 +320,7 @@ namespace Flute
          {
             if (_fileUrl.StartsWith(url))
             {
-               currentHost = url;
+               urlValidateHost = url;
             }
          }
 
@@ -331,10 +336,10 @@ namespace Flute
          }
 
          // www.Linguee.com use 'DE/' as relative path for voice files.
-         if (currentHost == null && _fileUrl.StartsWith("DE/"))
+         if (urlValidateHost == null && _fileUrl.StartsWith("DE/"))
          {
-            //NOTE: check if 'currentHost' didn't set before. If setted it means we have multiple source! sth WRONG!!!
-            currentHost = _hostsUrl[Array.IndexOf(_hostsUrl, "www.linguee.com")];
+            //NOTE: check if 'urlValidateHost' didn't set before. If setted it means we have multiple source! sth WRONG!!!
+            urlValidateHost = _hostsUrl[Array.IndexOf(_hostsUrl, "www.linguee.com")];
          }
 
          //TODO: Add more if statement to check more sources!
