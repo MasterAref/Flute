@@ -299,40 +299,6 @@ namespace Flute
 
       }
 
-      public string DetectType()
-      {
-         if (_fileUrl == null)
-         {
-            Console.WriteLine("ERROR:\tThere is no downloading url.");
-            return _fileUrl;
-         }
-
-         if (_fileUrl.StartsWith("http://www.linguee.com/"))
-         {
-            
-         }
-         else if (_fileUrl.StartsWith("DE/"))
-         {
-            _fileUrl = _hostsUrl + _fileUrl;
-         }
-         else if (_fileUrl.StartsWith("/DE"))
-         {
-            _fileUrl = _fileUrl.Substring(1);
-            _fileUrl = _hostsUrl + _fileUrl;
-         }
-
-
-         if (!_fileUrl.EndsWith(".mp3"))
-         {
-            if (_fileUrl.Contains("mp3") && _fileUrl.EndsWith("mp3"))
-            {
-               _fileUrl = _fileUrl.Substring(0, _fileUrl.Length - 3);
-            }
-            _fileUrl = _fileUrl.Insert(_fileUrl.Length, ".mp3");
-         }
-
-         return _fileUrl;
-      }
    }
 
    interface IStreamDownload
