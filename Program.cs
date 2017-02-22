@@ -278,7 +278,17 @@ namespace Flute
          dlObject.host = urlValidateHost;
 
          // Setup 'DownloadObject.downloadUrl'
-         if (!IsFullUrl(_fileUrl)) urlValidateDlLink = urlValidateHost + _fileUrl;
+         if (!IsFullUrl(_fileUrl))
+         {
+            switch (urlValidateHost)
+            {
+               case "www.linguee.com":
+                  urlValidateDlLink = urlValidateHost + "/mp3/" + _fileUrl;
+                  break;
+
+               //TODO: add other cases for other sources.
+            }
+         }
          dlObject.downloadUrl = urlValidateDlLink;
 
 
