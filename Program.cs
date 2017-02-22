@@ -34,6 +34,11 @@ namespace Flute
          string copyLink = new UrlClipboard().CopyLink();
 
 
+         //[SCENE-3]: Validate and detect url component.
+         UrlValidate newUrl = new UrlValidate(copyLink, ConfigObject.sources);
+         
+
+
          //[TODO] Uncomment
          //Run();
 
@@ -245,16 +250,42 @@ namespace Flute
    /// </summary>
    class UrlValidate
    {
+      // FIELDS & PROPERTIES
       private string _fileUrl;
       private string[] _hostsUrl;
       private string currentHost { get; set; }
+
+
+      // CONSTRUCT
       public UrlValidate(string address, string[] hostsString)
       {
          this._fileUrl = address ?? null;
          this._hostsUrl = hostsString ?? null;
 
-         if (!IsFullUrl(_fileUrl)) return;
-         if (string.IsNullOrWhiteSpace(_fileUrl) || _hostsUrl == null) return;
+         if (string.IsNullOrWhiteSpace(_fileUrl) || _hostsUrl == null) return;  
+      }
+
+
+      // METHODS
+      public DownloadObject SetupDownloadObject()
+      {
+         DownloadObject dlObject = new DownloadObject();
+
+         // Setup 'host'
+         if (IsFullUrl(_fileUrl)) DetectFullUrlHost();
+         if (IsFullUrl(_fileUrl)) DetectRelativeUrlHost();
+         dlObject.host = currentHost;
+
+
+         //TODO: Setup other 'DownloadObject' fields
+
+         //TODO: Error checking for each 'DownloadObject' fields
+         if (currentHost == null)
+         {
+            Console.WriteLine("ERRPR: cannot find out file's host.");
+         }
+
+         return dlObject;
       }
 
       //NOTE: If provided string was not Full path url then it assuemes its reletive. 
@@ -264,15 +295,14 @@ namespace Flute
       {
          if (check.StartsWith("http://www.")) return true;
          if (check.StartsWith("https://www.")) return true;
+         if (check.StartsWith("www.")) return true;
          if (check.StartsWith("http://")) return true;
          if (check.StartsWith("https://")) return true;
 
          return false;
       }
 
-      
-
-      public void DetectFullUrlHost()
+      private void DetectFullUrlHost()
       {
 
          if (_fileUrl == null)
@@ -291,7 +321,7 @@ namespace Flute
 
       }
 
-      public void DetectRelativeUrlHost()
+      private void DetectRelativeUrlHost()
       {
          
          if (_fileUrl == null)
@@ -311,6 +341,7 @@ namespace Flute
 
       }
 
+      
    }
 
    interface IStreamDownload
