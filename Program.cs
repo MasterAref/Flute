@@ -235,6 +235,7 @@ namespace Flute
    {
       private string _fileUrl;
       private string[] _hostsUrl;
+      private string currentHost { get; set; }
       public UrlValidate(string address, string[] hostsString)
       {
          this._fileUrl = address ?? null;
@@ -259,13 +260,45 @@ namespace Flute
 
       
 
-      public string DetectHost()
+      public void DetectFullUrlHost()
       {
-         //TODO: write code.
 
+         if (_fileUrl == null)
+         {
+            Console.WriteLine("ERROR:\tThere is no downloading url.");
+            return;
+         }
 
-         return "";
+         foreach (var url in _hostsUrl)
+         {
+            if (_fileUrl.StartsWith(url))
+            {
+               currentHost = url;
+            }
+         }
+
       }
+
+      public void DetectRelativeUrlHost()
+      {
+         
+         if (_fileUrl == null)
+         {
+            Console.WriteLine("ERROR:\tThere is no downloading url.");
+            return;
+         }
+
+         // www.Linguee.com use 'DE/' as relative path for voice files.
+         if (currentHost == null && _fileUrl.StartsWith("DE/"))
+         {
+            //NOTE: check if 'currentHost' didn't set before. If setted it means we have multiple source! sth WRONG!!!
+            currentHost = _hostsUrl[Array.IndexOf(_hostsUrl, "www.linguee.com")];
+         }
+
+         //TODO: Add more if statement to check more sources!
+
+      }
+
       public string DetectType()
       {
          if (_fileUrl == null)
