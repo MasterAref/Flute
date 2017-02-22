@@ -126,6 +126,18 @@ namespace Flute
       public string saveTo;
    }
 
+
+   struct DownloadObject
+   {
+      public string saveTo;
+      public string name;
+      public string host;
+      public string downloadUrl;
+      public string hostPrefix;
+      public string typePrefix;
+
+   }
+
    interface IDefCommands
    {
       bool IsCfgExist(string path);
