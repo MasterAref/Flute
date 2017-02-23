@@ -138,6 +138,7 @@ namespace Flute
       public string name;
       public string host;
       public string downloadUrl;
+      public string type;
       public string hostPrefix;
       public string typePrefix;
 
@@ -268,7 +269,7 @@ namespace Flute
 
 
       // METHODS
-      public DownloadObject SetupDownloadObject()
+      public DownloadObject SetupPartialDlObject()
       {
          DownloadObject dlObject = new DownloadObject();
 
@@ -291,7 +292,7 @@ namespace Flute
          }
          dlObject.downloadUrl = urlValidateDlLink;
 
-
+         
          //TODO: Setup other 'DownloadObject' fields
 
          //TODO: Error checking for each 'DownloadObject' fields
