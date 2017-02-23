@@ -292,6 +292,8 @@ namespace Flute
          }
          dlObject.downloadUrl = urlValidateDlLink;
 
+         // Setup 'DownloadObject.type'
+         dlObject.type = DetectWordType();
          
          //TODO: Setup other 'DownloadObject' fields
 
@@ -357,7 +359,27 @@ namespace Flute
 
       }
 
-      
+      private string DetectWordType()
+      {
+         Dictionary<string, string> typesDictionary = new Dictionary<string, string>();
+         typesDictionary.Add("verb", "-201");
+         typesDictionary.Add("adjective", "-");
+         typesDictionary.Add("adverb", "-");
+         typesDictionary.Add("nounFeminine", "-");
+         typesDictionary.Add("nounMasculine", "-");
+         typesDictionary.Add("nounNeuter", "-");
+         typesDictionary.Add("conjuction", "-");
+
+
+         foreach (var type in typesDictionary)
+         {
+            if (_fileUrl.EndsWith(type.Key))
+            {
+               return type.Key;
+            }
+         }
+         return "404";
+      }
    }
 
    interface IStreamDownload
