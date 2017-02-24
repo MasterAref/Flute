@@ -36,8 +36,32 @@ namespace Flute
 
          //[SCENE-3]: Validate and detect url component.
          UrlValidate newUrl = new UrlValidate(copyLink, ConfigObject.sources);
-         
+         DownloadObject newDownload = newUrl.SetupPartialDlObject();
 
+
+         //[SCENE-4]: Set file name
+         //TODO: all field should be setted automatically in sub classes.
+         Console.WriteLine("What should i call this file?!");
+         string tempFileName = Console.ReadLine();
+         if (String.IsNullOrWhiteSpace(tempFileName))
+         {
+            Console.WriteLine("You piece of shit trying to break me! now i choose random file name for you haHAA!");
+            tempFileName = Path.GetRandomFileName();
+            tempFileName = tempFileName.Replace(".", String.Empty);
+            newDownload.name = tempFileName + ".mp3";
+         }
+         newDownload.name = tempFileName + ".mp3";
+
+
+         //[SCENE-5] Set save-to
+         //TODO: all field should be setted automatically in sub classes.
+         newDownload.saveTo = ConfigObject.saveTo;
+
+
+         //[SCENE-6] Download and Save
+         StreamSave streamSave = new StreamSave(new StreamDownload().DownloadStream(newDownload.downloadUrl));
+         //TODO: Manually concrete to string and send it as argument isn't dumb?!!! new field for DownloadObject?!
+         streamSave.SaveStream(newDownload.saveTo + newDownload.name);
 
          //[TODO] Uncomment
          //Run();
@@ -275,7 +299,7 @@ namespace Flute
 
          // Setup 'DownloadObject.host'
          if (IsFullUrl(_fileUrl)) DetectFullUrlHost();
-         if (IsFullUrl(_fileUrl)) DetectRelativeUrlHost();
+         if (!IsFullUrl(_fileUrl)) DetectRelativeUrlHost();
          dlObject.host = urlValidateHost;
 
          // Setup 'DownloadObject.downloadUrl'
@@ -284,7 +308,7 @@ namespace Flute
             switch (urlValidateHost)
             {
                case "www.linguee.com":
-                  urlValidateDlLink = urlValidateHost + "/mp3/" + _fileUrl;
+                  urlValidateDlLink = "http://" + urlValidateHost + "/mp3/" + _fileUrl;
                   break;
 
                //TODO: add other cases for other sources.
@@ -311,13 +335,24 @@ namespace Flute
       // with DetectHost().
       private bool IsFullUrl(string check)
       {
-         if (check.StartsWith("http://www.")) return true;
-         if (check.StartsWith("https://www.")) return true;
-         if (check.StartsWith("www.")) return true;
-         if (check.StartsWith("http://")) return true;
-         if (check.StartsWith("https://")) return true;
+         try
+         {
+            if (String.IsNullOrWhiteSpace(check)) throw new Exception("There is no Link in clipboard!");
+            if (check.StartsWith("http://www.")) return true;
+            if (check.StartsWith("https://www.")) return true;
+            if (check.StartsWith("www.")) return true;
+            if (check.StartsWith("http://")) return true;
+            if (check.StartsWith("https://")) return true;
 
-         return false;
+            return false;
+         }
+         catch (Exception e)
+         {
+            Console.WriteLine(e.ToString());
+            return false;
+         }
+         
+         
       }
 
       private void DetectFullUrlHost()
@@ -430,9 +465,12 @@ namespace Flute
       }
 
 
-      public void SaveStream()
+      public void SaveStream(string Fullpath)
       {
-         SaveTo = @"E:\Test.mp3";
+         SaveTo = Fullpath;
+         //SaveTo = @"E:\Test.mp3";
+
+         if (String.IsNullOrWhiteSpace(SaveTo)) return;
 
          if (_stream == null)
          {
